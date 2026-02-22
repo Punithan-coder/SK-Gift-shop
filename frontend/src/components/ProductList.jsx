@@ -1,11 +1,36 @@
-import React from 'react'
+import { useMemo } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import ProductCard from './ProductCard'
+import './ProductList.css'
+import { SAMPLE_PRODUCTS } from '../data/products'
 
-export default function ProductList() {
-  const dummy = []
+const ProductList = () => {
+  const [searchParams] = useSearchParams()
+  const q = (searchParams.get('q') ?? '').trim().toLowerCase()
+
+  const products = useMemo(() => {
+    const list = SAMPLE_PRODUCTS
+    if (!q) return list
+    return list.filter((p) => (p.title ?? '').toLowerCase().includes(q))
+  }, [q])
+
+  if (!products.length) {
+    return (
+      <div className="product-list-empty">
+        <p>{q ? `No products found for "${searchParams.get('q')}".` : 'No products available.'}</p>
+      </div>
+    )
+  }
+
   return (
-    <div>
-      {dummy.length === 0 ? <p>No products (placeholder)</p> : dummy.map(p => <ProductCard key={p.id} product={p} />)}
-    </div>
+    <ul className="product-list">
+      {products.map((product) => (
+        <li key={product.id}>
+          <ProductCard product={product} />
+        </li>
+      ))}
+    </ul>
   )
 }
+
+export default ProductList

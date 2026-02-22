@@ -1,0 +1,30 @@
+/* ============================================
+   HOMEPAGE
+   ============================================ */
+
+.homepage {
+  padding-bottom: var(--space-2xl);
+}
+
+.products-section {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--space-2xl) var(--space-xl);
+  padding-top: calc(var(--space-2xl) + 20px);
+}
+
+.products-section h2 {
+  font-family: var(--font-heading);
+  font-size: clamp(2rem, 5vw, 2.75rem);
+  font-weight: 700;
+  color: var(--color-text);
+  text-align: center;
+  margin-bottom: var(--space-sm);
+}
+
+.section-sub {
+  text-align: center;
+  color: var(--color-text-muted);
+  font-size: 1.05rem;
+  margin-bottom: var(--space-2xl);
+}

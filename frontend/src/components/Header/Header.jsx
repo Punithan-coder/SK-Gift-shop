@@ -1,18 +1,19 @@
-import React from 'react'
+import { Link } from 'react-router-dom'
 import './Header.css'
 
-function Header() {
-  return (
-    <div className="header">
-      <div className='header-contents'>
-        <h1>Gifts for every occasion</h1>
-        <p>Discover the perfect gift for your loved ones. Explore our wide range of unique and thoughtful gifts for every occasion.</p>
-        <button className='shop-now'>Shop Now</button>
+const Header = () => (
+  <header className="hero">
+    <div className="hero-bg" />
+    <div className="hero-content">
+      <span className="hero-badge">Curated for Every Occasion</span>
+      <h1>Gifts That Create Moments</h1>
+      <p>Discover unique, thoughtful gifts for the people who matter most. From personalized keepsakes to luxurious treats.</p>
+      <div className="hero-actions">
+        <Link to="/#products" className="btn btn-primary">Shop Now</Link>
+        <Link to="/contact" className="btn btn-outline">Contact Us</Link>
       </div>
-      
     </div>
-  )
-}
+  </header>
+)
 
 export default Header
-
