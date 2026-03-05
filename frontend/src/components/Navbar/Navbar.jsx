@@ -1,6 +1,7 @@
 import { useState, useCallback, useEffect } from 'react'
 import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
+import { useCart } from '../../context/CartContext'
 import './Navbar.css'
 
 const Navbar = () => {
@@ -10,6 +11,7 @@ const Navbar = () => {
   const location = useLocation()
   const navigate = useNavigate()
   const { user, logout, isAuthenticated, loading } = useAuth()
+  const { itemCount } = useCart()
 
   const isActive = (path) => location.pathname === path
 
@@ -65,6 +67,7 @@ const Navbar = () => {
             <circle cx="20" cy="21" r="1" />
             <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
           </svg>
+          {itemCount > 0 && <span className="cart-count">{itemCount}</span>}
         </Link>
         {loading ? (
           <span className="nav-auth-loading">...</span>

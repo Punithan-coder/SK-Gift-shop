@@ -92,3 +92,9 @@
 .product-card__btn:hover {
   background: var(--color-primary-hover);
 }
+
+
+.product-card__btn:disabled {
+  background: #4caf50; 
+  cursor: default;
+}

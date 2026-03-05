@@ -1,7 +1,4 @@
-/**
- * Product data - add image field for each product.
- * Images: /images/products/Product-1.jpeg through Product-4.jpeg
- */
+
 export const SAMPLE_PRODUCTS = [
   {
     id: 1,
@@ -30,5 +27,47 @@ export const SAMPLE_PRODUCTS = [
     price: 39.99,
     category: 'Cute Cups',
     image: '/images/products/Product-4.jpeg',
+  },{
+    id: 5,
+    title: 'Breathig Teddy',
+    price: 750,
+    category: 'Cute Cups',
+    image: '/images/products/Product-5.jpeg',
+  },{
+    id: 6,
+    title: 'Panda Lamp ' ,
+    price: 320,
+    category: 'Cute Cups',
+    image: '/images/products/Product-6.jpeg',
+  },{
+    id: 7,
+    title: 'Nice Bottle 400ml',
+    price: 79,
+    category: 'Cute Cups',
+    image: '/images/products/Product-7.jpeg',
+  },{
+    id: 8,
+    title: 'Love Magnet Keychain',
+    price: 150,
+    category: 'Cute Cups',
+    image: '/images/products/Product-8.jpeg',
+  },{
+    id: 9,
+    title: 'Car Keychain Big',
+    price: 50,
+    category: 'Cute Cups',
+    image: '/images/products/Product-9.jpeg',
+  },{
+    id: 10,
+    title: 'Face Change Keychain',
+    price: 60,
+    category: 'Cute Cups',
+    image: '/images/products/Product-10.jpeg',
+  },{
+    id: 11,
+    title: 'Mini Toy Lamp ',
+    price:79,
+    category: 'Cute Cups',
+    image: '/images/products/Product-11.jpeg',
   },
 ]

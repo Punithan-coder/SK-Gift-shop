@@ -1,16 +1,25 @@
-import { memo, useCallback } from 'react'
+import { memo, useCallback, useMemo } from 'react'
+import { useCart } from '../context/CartContext'
 import './ProductCard.css'
 
 const ProductCard = memo(({ product }) => {
   const { id, title, price, category, image } = product ?? {}
 
+  const { addToCart, items } = useCart()
+
+  if (id == null) return null
+
+  const inCart = useMemo(() => {
+    return items.some((i) => i.product.id === id)
+  }, [items, id])
+
   const handleAddToCart = useCallback((e) => {
     e.preventDefault()
     e.stopPropagation()
-    // TODO: add to cart
-  }, [])
-
-  if (id == null) return null
+    if (product && !inCart) {
+      addToCart(product)
+    }
+  }, [addToCart, product, inCart])
 
   return (
     <article className="product-card">
@@ -34,8 +43,9 @@ const ProductCard = memo(({ product }) => {
         type="button"
         className="product-card__btn"
         onClick={handleAddToCart}
+        disabled={inCart}
       >
-        Add to Cart
+        {inCart ? 'Added' : 'Add to Cart'}
       </button>
     </article>
   )

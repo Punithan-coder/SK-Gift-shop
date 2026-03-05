@@ -1,5 +1,6 @@
 import { useParams, Link } from 'react-router-dom'
 import { SAMPLE_PRODUCTS } from '../../data/products'
+import { useCart } from '../../context/CartContext'
 import './ProductDetail.css'
 
 const ProductDetail = () => {
@@ -17,6 +18,14 @@ const ProductDetail = () => {
 
   const { title, price, category, image } = product
 
+  const { addToCart, items } = useCart()
+
+  const inCart = items.some((i) => i.product.id === product.id)
+
+  const handleAdd = () => {
+    if (!inCart) addToCart(product)
+  }
+
   return (
     <div className="product-detail">
       <Link to="/" className="product-detail__back">← Back to shop</Link>
@@ -32,7 +41,14 @@ const ProductDetail = () => {
           <span className="product-detail__category">{category}</span>
           <h1>{title}</h1>
           <p className="product-detail__price">${typeof price === 'number' ? price.toFixed(2) : price}</p>
-          <button type="button" className="product-detail__btn">Add to Cart</button>
+          <button
+            type="button"
+            className="product-detail__btn"
+            onClick={handleAdd}
+            disabled={inCart}
+          >
+            {inCart ? 'Added' : 'Add to Cart'}
+          </button>
         </div>
       </div>
     </div>

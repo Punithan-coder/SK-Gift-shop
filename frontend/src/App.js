@@ -2,6 +2,7 @@ import React, { Suspense, lazy } from 'react'
 import Navbar from './components/Navbar/Navbar'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { AuthProvider } from './context/AuthContext'
+import { CartProvider } from './context/CartContext'
 
 const Homepage = lazy(() => import('./components/Homepage/Homepage'))
 const ProductDetail = lazy(() => import('./components/ProductDetail/ProductDetail'))
@@ -22,8 +23,9 @@ function LoadingFallback() {
 function App() {
   return (
     <AuthProvider>
-      <BrowserRouter>
-        <div className="app">
+      <CartProvider>
+        <BrowserRouter>
+          <div className="app">
           <Navbar />
           <main>
             <Suspense fallback={<LoadingFallback />}>
@@ -38,7 +40,8 @@ function App() {
             </Suspense>
           </main>
         </div>
-      </BrowserRouter>
+        </BrowserRouter>
+      </CartProvider>
     </AuthProvider>
   )
 }
