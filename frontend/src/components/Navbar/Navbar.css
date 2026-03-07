@@ -122,6 +122,7 @@
   color: var(--color-text);
   border-radius: var(--radius-md);
   transition: color var(--transition-fast), background var(--transition-fast);
+  position: relative;
 }
 
 .cart-btn:hover {
@@ -134,14 +135,16 @@
   background: var(--color-primary);
   color: white;
   border-radius: 50%;
-  width: 18px;
-  height: 18px;
+  width: 20px;
+  height: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
+  font-weight: 700;
   position: absolute;
-  top: 4px;
-  right: 4px;
+  top: 0px;
+  right: 0px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .signin-btn {

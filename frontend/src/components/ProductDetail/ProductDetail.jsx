@@ -40,7 +40,7 @@ const ProductDetail = () => {
         <div className="product-detail__info">
           <span className="product-detail__category">{category}</span>
           <h1>{title}</h1>
-          <p className="product-detail__price">${typeof price === 'number' ? price.toFixed(2) : price}</p>
+          <p className="product-detail__price">₹{typeof price === 'number' ? price.toFixed(2) : price}</p>
           <button
             type="button"
             className="product-detail__btn"

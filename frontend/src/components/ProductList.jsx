@@ -8,10 +8,23 @@ const ProductList = () => {
   const [searchParams] = useSearchParams()
   const q = (searchParams.get('q') ?? '').trim().toLowerCase()
 
-  const products = useMemo(() => {
+  const { products, groupedByCategory } = useMemo(() => {
     const list = SAMPLE_PRODUCTS
-    if (!q) return list
-    return list.filter((p) => (p.title ?? '').toLowerCase().includes(q))
+    const filtered = q ? list.filter((p) => (p.title ?? '').toLowerCase().includes(q)) : list
+    
+    // Group products by category
+    const grouped = filtered.reduce((acc, product) => {
+      const cat = product.category || 'Other'
+      if (!acc[cat]) acc[cat] = []
+      acc[cat].push(product)
+      return acc
+    }, {})
+    
+    return { 
+      products: filtered, 
+      groupedByCategory: grouped,
+      categories: Object.keys(grouped).sort()
+    }
   }, [q])
 
   if (!products.length) {
@@ -22,14 +35,34 @@ const ProductList = () => {
     )
   }
 
+  // If searching, show flat list; otherwise show by category
+  if (q) {
+    return (
+      <ul className="product-list">
+        {products.map((product) => (
+          <li key={product.id}>
+            <ProductCard product={product} />
+          </li>
+        ))}
+      </ul>
+    )
+  }
+
   return (
-    <ul className="product-list">
-      {products.map((product) => (
-        <li key={product.id}>
-          <ProductCard product={product} />
-        </li>
+    <div className="products-by-category">
+      {Object.entries(groupedByCategory).map(([category, categoryProducts]) => (
+        <section key={category} className="product-category-section">
+          <h3 className="product-category-title">{category}</h3>
+          <ul className="product-list">
+            {categoryProducts.map((product) => (
+              <li key={product.id}>
+                <ProductCard product={product} />
+              </li>
+            ))}
+          </ul>
+        </section>
       ))}
-    </ul>
+    </div>
   )
 }
 

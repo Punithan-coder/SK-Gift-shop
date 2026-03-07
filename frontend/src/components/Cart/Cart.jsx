@@ -1,9 +1,20 @@
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useCart } from '../../context/CartContext'
+import { useAuth } from '../../context/AuthContext'
 import './Cart.css'
 
 const Cart = () => {
   const { items, totalPrice, updateQuantity, removeFromCart, clearCart } = useCart()
+  const { isAuthenticated } = useAuth()
+  const navigate = useNavigate()
+
+  const handleCheckout = () => {
+    if (!isAuthenticated) {
+      navigate('/login')
+    } else {
+      navigate('/checkout')
+    }
+  }
 
   if (!items.length) {
     return (
@@ -35,7 +46,7 @@ const Cart = () => {
             )}
             <div className="cart-item-details">
               <h3>{item.product.title}</h3>
-              <p>${item.product.price?.toFixed(2)}</p>
+              <p>₹{item.product.price?.toFixed(2)}</p>
               <div className="cart-item-actions">
                 <label>
                   Qty:
@@ -55,10 +66,15 @@ const Cart = () => {
         ))}
       </ul>
       <div className="cart-summary">
-        <p>Total: ${totalPrice.toFixed(2)}</p>
-        <button type="button" onClick={clearCart} className="btn-clear">
-          Clear Cart
-        </button>
+        <p>Total: ₹{totalPrice.toFixed(2)}</p>
+        <div className="cart-actions">
+          <button type="button" onClick={clearCart} className="btn-clear">
+            🗑️ Clear Cart
+          </button>
+          <button type="button" onClick={handleCheckout} className="btn-checkout">
+            🛒 Proceed to Checkout
+          </button>
+        </div>
       </div>
     </div>
   )

@@ -4,6 +4,35 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@400;500;600;700&display=swap');
 
+@keyframes santaFly {
+  0% {
+    left: -150px;
+    top: 20px;
+  }
+  50% {
+    top: 10px;
+  }
+  100% {
+    left: calc(100% + 150px);
+    top: 20px;
+  }
+}
+
+@keyframes reindeerBounce {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  25% {
+    transform: translateY(-8px) rotate(-5deg);
+  }
+  50% {
+    transform: translateY(-15px) rotate(0deg);
+  }
+  75% {
+    transform: translateY(-8px) rotate(5deg);
+  }
+}
+
 :root {
   /* Colors - Luxury Gift Boutique */
   --color-primary: #8B2942;
@@ -63,6 +92,33 @@ body {
   color: var(--color-text);
   background: var(--color-bg);
   line-height: 1.6;
+  position: relative;
+  overflow-x: hidden;
+}
+
+body::before {
+  content: '🎅';
+  position: fixed;
+  font-size: 80px;
+  z-index: 1;
+  animation: santaFly 18s linear infinite;
+  pointer-events: none;
+  filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.1));
+  top: 30px;
+  left: -150px;
+}
+
+body::after {
+  content: '🦌 🦌';
+  position: fixed;
+  font-size: 65px;
+  z-index: 1;
+  animation: santaFly 18s linear infinite;
+  animation-delay: -2s;
+  pointer-events: none;
+  filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.1));
+  top: 85px;
+  left: -100px;
 }
 
 a {
@@ -106,8 +162,12 @@ button {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  position: relative;
+  z-index: 10;
 }
 
 .app > main {
   flex: 1;
+  position: relative;
+  z-index: 2;
 }
