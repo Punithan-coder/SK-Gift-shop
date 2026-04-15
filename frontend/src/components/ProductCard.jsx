@@ -1,9 +1,9 @@
-import { memo, useCallback, useMemo, useState, useEffect } from 'react'
+import { memo, useCallback, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useCart } from '../context/CartContext'
 import './ProductCard.css'
 
-const ProductCard = memo(({ product }) => {
+const ProductCard = memo(({ product, onOpenFullCatalog }) => {
   const { id, title, price, category, image } = product ?? {}
   const navigate = useNavigate()
   const { addToCart, items } = useCart()
@@ -31,10 +31,28 @@ const ProductCard = memo(({ product }) => {
     navigate('/cart')
   }, [navigate])
 
+  const handleShowAllProducts = useCallback(
+    (e) => {
+      if (e.defaultPrevented) return
+      if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return
+      e.preventDefault()
+      if (onOpenFullCatalog) {
+        onOpenFullCatalog()
+        return
+      }
+      navigate({ pathname: '/', search: '', hash: '#products' })
+    },
+    [navigate, onOpenFullCatalog]
+  )
+
   return (
     <>
       <article className="product-card">
-        <a href={`/product/${id}`} className="product-card__link">
+        <a
+          href="/#products"
+          className="product-card__link"
+          onClick={handleShowAllProducts}
+        >
           <div className="product-card__image">
             {image ? (
               <img src={image} alt={title} loading="lazy" />

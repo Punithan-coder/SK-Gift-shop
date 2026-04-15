@@ -3,6 +3,35 @@ import './Contactpage.css'
 
 const Contactpage = () => {
   const [showForm, setShowForm] = useState(false)
+  const [formData, setFormData] = useState({
+    name: '',
+    phone: '',
+    subject: '',
+    message: '',
+  })
+
+  const handleChange = (e) => {
+    const { id, value } = e.target
+    setFormData((prev) => ({ ...prev, [id]: value }))
+  }
+
+  const handleSubmit = (e) => {
+    e.preventDefault()
+
+    const ownerPhone = (process.env.REACT_APP_WHATSAPP_NUMBER || '918438529815').replace(/\D/g, '')
+    const subjectText = formData.subject || 'General Inquiry'
+    const text = [
+      'Hello SK Gift Shop,',
+      '',
+      `Name: ${formData.name}`,
+      `Phone: ${formData.phone || 'Not provided'}`,
+      `Subject: ${subjectText}`,
+      `Message: ${formData.message || 'No message'}`,
+    ].join('\n')
+
+    const whatsappUrl = `https://wa.me/${ownerPhone}?text=${encodeURIComponent(text)}`
+    window.open(whatsappUrl, '_blank')
+  }
 
   return (
     <div className="contact-page">
@@ -41,27 +70,27 @@ const Contactpage = () => {
       ) : (
         <div className="contact-form-wrap">
           <h2>Send a Message</h2>
-          <form className="contact-form" onSubmit={(e) => e.preventDefault()}>
+          <form className="contact-form" onSubmit={handleSubmit}>
             <div className="form-group">
               <label htmlFor="name">Full Name</label>
-              <input type="text" id="name" placeholder="John Doe" required />
+              <input type="text" id="name" placeholder="John Doe" value={formData.name} onChange={handleChange} required />
             </div>
             <div className="form-group">
               <label htmlFor="phone">Phone Number</label>
-              <input type="tel" id="phone" placeholder="Enter your phone number" />
+              <input type="tel" id="phone" placeholder="Enter your phone number" value={formData.phone} onChange={handleChange} />
             </div>
             <div className="form-group">
               <label htmlFor="subject">Subject</label>
-              <select id="subject">
+              <select id="subject" value={formData.subject} onChange={handleChange}>
                 <option value="">Select a subject</option>
-                <option value="order">Order Inquiry</option>
-                <option value="custom">Custom Gift Inquiry</option>
-                <option value="feedback">Feedback</option>
+                <option value="Order Inquiry">Order Inquiry</option>
+                <option value="Custom Gift Inquiry">Custom Gift Inquiry</option>
+                <option value="Feedback">Feedback</option>
               </select>
             </div>
             <div className="form-group">
               <label htmlFor="message">Message</label>
-              <textarea id="message" rows={5} placeholder="How can we help you create magic today?" />
+              <textarea id="message" rows={5} placeholder="How can we help you create magic today?" value={formData.message} onChange={handleChange} />
             </div>
             <button type="submit" className="btn-send">Send Message →</button>
           </form>

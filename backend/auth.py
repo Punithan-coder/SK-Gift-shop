@@ -37,7 +37,7 @@ def register():
     db.session.commit()
 
     token = jwt.encode(
-        {'user_id': user.id, 'exp': datetime.utcnow() + timedelta(days=7)},
+        {'user_id': user.id, 'exp': datetime.utcnow() + timedelta(days=365)},
         get_secret_key(),
         algorithm='HS256'
     )
@@ -65,7 +65,7 @@ def login():
         return jsonify({'error': 'Invalid email or password'}), 401
 
     token = jwt.encode(
-        {'user_id': user.id, 'exp': datetime.utcnow() + timedelta(days=7)},
+        {'user_id': user.id, 'exp': datetime.utcnow() + timedelta(days=365)},
         get_secret_key(),
         algorithm='HS256'
     )

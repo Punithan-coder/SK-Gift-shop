@@ -36,12 +36,29 @@
 }
 
 .product-list {
+  /* At least 20px between cards (row + column); scales up slightly on large screens */
+  --product-grid-gap: clamp(20px, 2.2vw, 28px);
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(185px, 185px));
+  gap: var(--product-grid-gap);
+  justify-content: center;
+  align-items: stretch;
+  align-content: start;
   list-style: none;
   margin: 0;
   padding: 0;
+}
+
+.product-list > li {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+@media (min-width: 1024px) {
+  .product-list {
+    --product-grid-gap: clamp(22px, 2vw, 32px);
+  }
 }
 
 .product-list-empty {
@@ -59,24 +76,26 @@
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 3rem;
-  padding: 2rem 0;
+  gap: 1.3rem;
+  padding: 0.6rem 0 1rem;
 }
 
 .product-category-section {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
-  animation: fadeInDown 0.6s ease-out;
-  padding: 0;
-  border-radius: var(--radius-lg);
+  gap: 0.65rem;
+  animation: fadeInDown 0.35s ease-out;
+  padding: 0.9rem;
+  border-radius: 12px;
+  background: #ffffff;
+  border: 1px solid #e5eaf2;
 }
 
 .product-category-title {
   font-family: var(--font-heading);
-  font-size: 1.5rem;
+  font-size: 1.05rem;
   font-weight: 700;
-  color: var(--color-text);
+  color: #0f172a;
   margin: 0;
   padding: 0;
   display: inline-block;
@@ -90,9 +109,33 @@
 .product-category-title::after {
   content: '';
   display: block;
-  width: 50px;
+  width: 38px;
   height: 2px;
-  background: var(--color-primary);
-  margin-top: 0.5rem;
+  background: linear-gradient(90deg, #2563eb, #7c3aed);
+  margin-top: 0.35rem;
   border-radius: 1px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .product-list {
+    --product-grid-gap: max(20px, 1.125rem);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 480px) {
+  .product-list {
+    --product-grid-gap: max(20px, 3.5vw);
+  }
+
+  .products-by-category {
+    gap: 1.2rem;
+    padding-top: 0.5rem;
+  }
+
+  .product-category-section {
+    padding: 0.6rem;
+    border-radius: 12px;
+  }
 }

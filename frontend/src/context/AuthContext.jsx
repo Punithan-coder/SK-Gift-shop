@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, useEffect, useCallback } fr
 
 const AuthContext = createContext(null)
 
-const API_URL = process.env.REACT_APP_API_URL || ''
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000'
 const TOKEN_KEY = 'sk_gift_token'
 
 export function AuthProvider({ children }) {

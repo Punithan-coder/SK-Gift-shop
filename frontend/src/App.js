@@ -1,5 +1,6 @@
-import React, { Suspense, lazy } from 'react'
+import React, { Suspense, lazy, useEffect } from 'react'
 import Navbar from './components/Navbar/Navbar'
+import Footer from './components/Footer/Footer'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { AuthProvider } from './context/AuthContext'
 import { CartProvider } from './context/CartContext'
@@ -12,6 +13,7 @@ const OrderHistory = lazy(() => import('./components/OrderHistory/OrderHistory')
 const Contactpage = lazy(() => import('./components/Contactpage/Contactpage'))
 const Login = lazy(() => import('./components/Auth/Login'))
 const SignUp = lazy(() => import('./components/Auth/SignUp'))
+const Aboutpage = lazy(() => import('./components/Aboutpage/Aboutpage'))
 
 function LoadingFallback() {
   return (
@@ -23,6 +25,29 @@ function LoadingFallback() {
 }
 
 function App() {
+  useEffect(() => {
+    const blockGesture = (event) => {
+      event.preventDefault()
+    }
+    const blockPinchZoomWheel = (event) => {
+      if (event.ctrlKey) {
+        event.preventDefault()
+      }
+    }
+
+    document.addEventListener('gesturestart', blockGesture, { passive: false })
+    document.addEventListener('gesturechange', blockGesture, { passive: false })
+    document.addEventListener('gestureend', blockGesture, { passive: false })
+    document.addEventListener('wheel', blockPinchZoomWheel, { passive: false })
+
+    return () => {
+      document.removeEventListener('gesturestart', blockGesture)
+      document.removeEventListener('gesturechange', blockGesture)
+      document.removeEventListener('gestureend', blockGesture)
+      document.removeEventListener('wheel', blockPinchZoomWheel)
+    }
+  }, [])
+
   return (
     <AuthProvider>
       <CartProvider>
@@ -38,11 +63,13 @@ function App() {
                 <Route path="/checkout" element={<Checkout />} />
                 <Route path="/orders" element={<OrderHistory />} />
                 <Route path="/contact" element={<Contactpage />} />
+                <Route path="/about" element={<Aboutpage />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/signup" element={<SignUp />} />
               </Routes>
             </Suspense>
           </main>
+          <Footer />
         </div>
         </BrowserRouter>
       </CartProvider>

@@ -1,19 +1,13 @@
 import { Link, useNavigate } from 'react-router-dom'
 import { useCart } from '../../context/CartContext'
-import { useAuth } from '../../context/AuthContext'
 import './Cart.css'
 
 const Cart = () => {
   const { items, totalPrice, updateQuantity, removeFromCart, clearCart } = useCart()
-  const { isAuthenticated } = useAuth()
   const navigate = useNavigate()
 
   const handleCheckout = () => {
-    if (!isAuthenticated) {
-      navigate('/login')
-    } else {
-      navigate('/checkout')
-    }
+    navigate('/checkout')
   }
 
   if (!items.length) {
@@ -48,16 +42,46 @@ const Cart = () => {
               <h3>{item.product.title}</h3>
               <p>₹{item.product.price?.toFixed(2)}</p>
               <div className="cart-item-actions">
-                <label>
-                  Qty:
+                <div className="qty-control" aria-label="Quantity controls">
+                  <button
+                    type="button"
+                    className="qty-btn"
+                    onClick={() => updateQuantity(item.product.id, Math.max(1, item.quantity - 1))}
+                    aria-label="Decrease quantity"
+                  >
+                    -
+                  </button>
                   <input
                     type="number"
                     min="1"
                     value={item.quantity}
-                    onChange={(e) => updateQuantity(item.product.id, parseInt(e.target.value, 10) || 1)}
+                    onChange={(e) => {
+                      const nextQty = Number.parseInt(e.target.value, 10)
+                      if (Number.isNaN(nextQty)) return
+                      updateQuantity(item.product.id, Math.max(1, nextQty))
+                    }}
+                    onBlur={(e) => {
+                      const nextQty = Number.parseInt(e.target.value, 10)
+                      if (Number.isNaN(nextQty) || nextQty < 1) {
+                        updateQuantity(item.product.id, 1)
+                      }
+                    }}
+                    aria-label="Quantity"
                   />
-                </label>
-                <button type="button" onClick={() => removeFromCart(item.product.id)}>
+                  <button
+                    type="button"
+                    className="qty-btn"
+                    onClick={() => updateQuantity(item.product.id, item.quantity + 1)}
+                    aria-label="Increase quantity"
+                  >
+                    +
+                  </button>
+                </div>
+                <button
+                  type="button"
+                  className="remove-item-btn"
+                  onClick={() => removeFromCart(item.product.id)}
+                >
                   Remove
                 </button>
               </div>

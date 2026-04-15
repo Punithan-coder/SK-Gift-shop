@@ -83,6 +83,15 @@
 html {
   scroll-behavior: smooth;
   scroll-padding-top: 80px;
+  touch-action: pan-x pan-y;
+  overscroll-behavior: none;
+}
+
+html,
+body,
+#root {
+  width: 100%;
+  max-width: 100%;
 }
 
 body {
@@ -94,32 +103,12 @@ body {
   line-height: 1.6;
   position: relative;
   overflow-x: hidden;
+  touch-action: pan-x pan-y;
 }
 
-body::before {
-  content: '🎅';
-  position: fixed;
-  font-size: 80px;
-  z-index: 1;
-  animation: santaFly 18s linear infinite;
-  pointer-events: none;
-  filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.1));
-  top: 30px;
-  left: -150px;
-}
+body::before { display: none; }
 
-body::after {
-  content: '🦌 🦌';
-  position: fixed;
-  font-size: 65px;
-  z-index: 1;
-  animation: santaFly 18s linear infinite;
-  animation-delay: -2s;
-  pointer-events: none;
-  filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.1));
-  top: 85px;
-  left: -100px;
-}
+body::after { display: none; }
 
 a {
   text-decoration: none;
@@ -164,10 +153,14 @@ button {
   flex-direction: column;
   position: relative;
   z-index: 10;
+  width: 100%;
 }
 
 .app > main {
   flex: 1;
   position: relative;
   z-index: 2;
+  width: min(1240px, 100%);
+  margin: 0 auto;
+  padding-inline: 12px;
 }

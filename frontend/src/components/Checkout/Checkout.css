@@ -1,7 +1,7 @@
 .checkout-page {
   min-height: 100vh;
-  background-color: #f9f9f9;
-  padding: 2rem 1rem;
+  background-color: #f6f7fb;
+  padding: 1.25rem 0.9rem;
 }
 
 .checkout-container {
@@ -11,11 +11,11 @@
 
 .checkout-header {
   text-align: center;
-  margin-bottom: 3rem;
+  margin-bottom: 1.4rem;
 }
 
 .checkout-header h1 {
-  font-size: 2.5rem;
+  font-size: clamp(1.6rem, 3vw, 2.2rem);
   color: #333;
   margin-bottom: 2rem;
   font-weight: 600;
@@ -72,14 +72,14 @@
 .checkout-content {
   display: grid;
   grid-template-columns: 1fr 350px;
-  gap: 2rem;
+  gap: 1.25rem;
 }
 
 .checkout-main {
   background: white;
-  border-radius: 8px;
-  padding: 2rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  padding: 1.25rem;
+  box-shadow: 0 6px 20px rgba(17, 24, 39, 0.08);
 }
 
 .checkout-main h2 {
@@ -217,6 +217,32 @@
   text-align: center;
 }
 
+.confirmation-animation {
+  width: 110px;
+  height: 110px;
+  margin: 0 auto 1.5rem;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, rgba(76, 175, 80, 0.7), transparent 60%),
+    rgba(76, 175, 80, 0.15);
+  box-shadow: 0 0 0 rgba(76, 175, 80, 0.5);
+  animation: pulseCircle 1.2s ease-out infinite;
+}
+
+@keyframes pulseCircle {
+  0% {
+    transform: scale(0.8);
+    box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.7);
+  }
+  70% {
+    transform: scale(1);
+    box-shadow: 0 0 0 18px rgba(76, 175, 80, 0);
+  }
+  100% {
+    transform: scale(0.8);
+    box-shadow: 0 0 0 0 rgba(76, 175, 80, 0);
+  }
+}
+
 .confirmation-success {
   margin-bottom: 3rem;
 }
@@ -275,6 +301,17 @@
   font-weight: 600;
 }
 
+.confirmation-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.confirmation-actions .btn-large {
+  flex: 1;
+  max-width: 200px;
+}
+
 .detail-section p {
   color: #333;
   line-height: 1.6;
@@ -297,9 +334,9 @@
 
 .checkout-sidebar {
   background-color: white;
-  border-radius: 8px;
+  border-radius: 12px;
   padding: 1.5rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 6px 20px rgba(17, 24, 39, 0.08);
   height: fit-content;
   position: sticky;
   top: 20px;
@@ -384,6 +421,14 @@
 }
 
 @media (max-width: 768px) {
+  .checkout-page {
+    padding: 0.8rem 0.55rem;
+  }
+
+  .checkout-header h1 {
+    margin-bottom: 1rem;
+  }
+
   .checkout-content {
     grid-template-columns: 1fr;
   }
@@ -409,6 +454,18 @@
   }
 
   .checkout-main {
-    padding: 1.5rem;
+    padding: 1rem;
+  }
+
+  .checkout-sidebar {
+    padding: 1rem;
+  }
+
+  .confirmation-actions {
+    flex-direction: column;
+  }
+
+  .confirmation-actions .btn-large {
+    max-width: 100%;
   }
 }

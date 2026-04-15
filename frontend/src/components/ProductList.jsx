@@ -1,68 +1,60 @@
-import { useMemo } from 'react'
-import { useSearchParams } from 'react-router-dom'
+import { useMemo, useCallback } from 'react'
+import { flushSync } from 'react-dom'
+import { useSearchParams, useNavigate } from 'react-router-dom'
 import ProductCard from './ProductCard'
 import './ProductList.css'
 import { SAMPLE_PRODUCTS } from '../data/products'
 
 const ProductList = () => {
-  const [searchParams] = useSearchParams()
+  const [searchParams, setSearchParams] = useSearchParams()
+  const navigate = useNavigate()
   const q = (searchParams.get('q') ?? '').trim().toLowerCase()
+  const cat = (searchParams.get('cat') ?? '').trim().toLowerCase()
 
-  const { products, groupedByCategory } = useMemo(() => {
+  const products = useMemo(() => {
     const list = SAMPLE_PRODUCTS
-    const filtered = q ? list.filter((p) => (p.title ?? '').toLowerCase().includes(q)) : list
-    
-    // Group products by category
-    const grouped = filtered.reduce((acc, product) => {
-      const cat = product.category || 'Other'
-      if (!acc[cat]) acc[cat] = []
-      acc[cat].push(product)
-      return acc
-    }, {})
-    
-    return { 
-      products: filtered, 
-      groupedByCategory: grouped,
-      categories: Object.keys(grouped).sort()
+    if (q) {
+      return list.filter((p) =>
+        (p.title ?? '').toLowerCase().includes(q) ||
+        (p.category ?? '').toLowerCase().includes(q)
+      )
     }
-  }, [q])
+    if (cat) {
+      return list.filter((p) => (p.category ?? '').toLowerCase() === cat)
+    }
+    return list
+  }, [q, cat])
+
+  /** Clears ?cat= / ?q= first (flushSync so URL updates before navigate, otherwise search can stay merged). */
+  const openFullCatalog = useCallback(() => {
+    flushSync(() => {
+      setSearchParams(new URLSearchParams(), { replace: false })
+    })
+    navigate({ pathname: '/', search: '', hash: '#products' }, { replace: false })
+  }, [setSearchParams, navigate])
 
   if (!products.length) {
     return (
       <div className="product-list-empty">
-        <p>{q ? `No products found for "${searchParams.get('q')}".` : 'No products available.'}</p>
+        <p>
+          {q
+            ? `No products found for "${searchParams.get('q')}".`
+            : cat
+              ? `No products found in "${searchParams.get('cat')}".`
+              : 'No products available.'}
+        </p>
       </div>
     )
   }
 
-  // If searching, show flat list; otherwise show by category
-  if (q) {
-    return (
-      <ul className="product-list">
-        {products.map((product) => (
-          <li key={product.id}>
-            <ProductCard product={product} />
-          </li>
-        ))}
-      </ul>
-    )
-  }
-
   return (
-    <div className="products-by-category">
-      {Object.entries(groupedByCategory).map(([category, categoryProducts]) => (
-        <section key={category} className="product-category-section">
-          <h3 className="product-category-title">{category}</h3>
-          <ul className="product-list">
-            {categoryProducts.map((product) => (
-              <li key={product.id}>
-                <ProductCard product={product} />
-              </li>
-            ))}
-          </ul>
-        </section>
+    <ul className="product-list">
+      {products.map((product) => (
+        <li key={product.id}>
+          <ProductCard product={product} onOpenFullCatalog={openFullCatalog} />
+        </li>
       ))}
-    </div>
+    </ul>
   )
 }
 

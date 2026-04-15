@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react'
+import { useLocation } from 'react-router-dom'
 import Header from '../Header/Header'
 import ProductList from '../ProductList'
 import Exploremenu from '../Exploremenu/Exploremenu'
@@ -6,6 +7,7 @@ import './Homepage.css'
 
 const Homepage = () => {
   const superheroRef = useRef(null)
+  const location = useLocation()
 
   useEffect(() => {
     if (!superheroRef.current) return
@@ -21,23 +23,16 @@ const Homepage = () => {
     return () => clearInterval(interval)
   }, [])
 
+  useEffect(() => {
+    if (location.hash === '#products') {
+      setTimeout(() => {
+        document.getElementById('products')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      }, 80)
+    }
+  }, [location.hash])
+
   return (
     <div className="homepage">
-      <div className="superhero-background" ref={superheroRef}>
-        <div className="superhero-left">
-          <div className="superhero-figure" title="Batman">
-            🦇
-            <div className="superhero-cape" />
-          </div>
-        </div>
-        <div className="superhero-right">
-          <div className="superhero-figure" title="Superman">
-            ⚡
-            <div className="superhero-cape" />
-          </div>
-        </div>
-        <div className="collision-effect" />
-      </div>
       <Header />
       <Exploremenu />
       <section id="products" className="products-section">

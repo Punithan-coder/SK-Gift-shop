@@ -11,7 +11,7 @@ const ProductDetail = () => {
     return (
       <div className="product-detail product-detail--not-found">
         <h2>Product not found</h2>
-        <Link to="/">← Back to shop</Link>
+        <Link to={{ pathname: '/', search: '', hash: '#products' }}>← Back to shop</Link>
       </div>
     )
   }
@@ -28,7 +28,12 @@ const ProductDetail = () => {
 
   return (
     <div className="product-detail">
-      <Link to="/" className="product-detail__back">← Back to shop</Link>
+      <Link
+        to={{ pathname: '/', search: '', hash: '#products' }}
+        className="product-detail__back"
+      >
+        ← Back to shop
+      </Link>
       <div className="product-detail__grid">
         <div className="product-detail__image-wrap">
           {image ? (

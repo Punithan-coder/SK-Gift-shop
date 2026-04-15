@@ -1,0 +1,52 @@
+.about-page {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 1.25rem 0 2.5rem;
+}
+
+.about-page__back {
+  display: inline-block;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--color-primary);
+  margin-bottom: 1.25rem;
+}
+
+.about-page__back:hover {
+  text-decoration: underline;
+}
+
+.about-page__card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 1.75rem 1.5rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.about-page__card h1 {
+  font-family: var(--font-heading);
+  font-size: 1.75rem;
+  color: var(--color-text);
+  margin: 0 0 1rem;
+}
+
+.about-page__card p {
+  margin: 0 0 1rem;
+  color: var(--color-text-muted);
+  line-height: 1.65;
+  font-size: 0.95rem;
+}
+
+.about-page__card p:last-child {
+  margin-bottom: 0;
+}
+
+.about-page__cta a {
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+.about-page__cta a:hover {
+  text-decoration: underline;
+}

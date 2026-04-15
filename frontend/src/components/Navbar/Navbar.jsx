@@ -31,6 +31,20 @@ const Navbar = () => {
     }
   }
 
+  const handleScrollProducts = (event) => {
+    event.preventDefault()
+
+    if (location.pathname !== '/') {
+      navigate('/')
+      setTimeout(() => {
+        document.getElementById('products')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      }, 100)
+      return
+    }
+
+    document.getElementById('products')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
+
   const handleLogout = () => {
     logout()
     navigate('/')
@@ -45,7 +59,7 @@ const Navbar = () => {
       <nav className="nav-center">
         <ul className="nav-links">
           <li><Link to="/" className={isActive('/') ? 'active' : ''}>Home</Link></li>
-          <li><Link to="/#products">Products</Link></li>
+          <li><a href="#products" onClick={handleScrollProducts}>Products</a></li>
           <li><Link to="/contact" className={isActive('/contact') ? 'active' : ''}>Contact</Link></li>
         </ul>
         <form className="search-bar" onSubmit={handleSearch} role="search">
@@ -71,16 +85,13 @@ const Navbar = () => {
         </Link>
         {loading ? (
           <span className="nav-auth-loading">...</span>
-        ) : isAuthenticated ? (
+        ) : isAuthenticated && (
           <div className="nav-user">
-            <span className="nav-user__email">{user?.email}</span>
+            <div className="nav-user-avatar">
+              {user?.email.charAt(0).toUpperCase()}
+            </div>
             <button type="button" className="signout-btn" onClick={handleLogout}>Logout</button>
           </div>
-        ) : (
-          <>
-            <Link to="/login" className="signin-btn">Sign In</Link>
-            <Link to="/signup" className="signup-btn">Sign Up</Link>
-          </>
         )}
       </div>
 

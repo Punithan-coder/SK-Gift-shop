@@ -1,17 +1,16 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useCart } from '../../context/CartContext'
-import { useAuth } from '../../context/AuthContext'
 import './Checkout.css'
 
 const Checkout = () => {
   const navigate = useNavigate()
   const { items, totalPrice, clearCart } = useCart()
-  const { user, isAuthenticated } = useAuth()
-  const [step, setStep] = useState(1) // 1: shipping, 2: payment, 3: confirmation
+  const [step, setStep] = useState(1) // 1: shipping, 2: confirmation
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [orderData, setOrderData] = useState(null)
+  const [whatsappUrl, setWhatsappUrl] = useState(null)
 
   const [shippingForm, setShippingForm] = useState({
     address: '',
@@ -21,29 +20,7 @@ const Checkout = () => {
     phone: '',
   })
 
-  const [paymentForm, setPaymentForm] = useState({
-    cardName: '',
-    cardNumber: '',
-    expiryDate: '',
-    cvv: '',
-    paymentMethod: 'card',
-  })
-
-  if (!isAuthenticated) {
-    return (
-      <div className="checkout-page">
-        <div className="checkout-error">
-          <h2>Please log in to checkout</h2>
-          <p>You need to be signed in to complete your purchase.</p>
-          <button onClick={() => navigate('/login')} className="btn-primary">
-            Go to Login
-          </button>
-        </div>
-      </div>
-    )
-  }
-
-  if (!items.length) {
+  if (!items.length && step === 1) {
     return (
       <div className="checkout-page">
         <div className="checkout-error">
@@ -63,12 +40,6 @@ const Checkout = () => {
     setError('')
   }
 
-  const handlePaymentChange = (e) => {
-    const { name, value } = e.target
-    setPaymentForm((prev) => ({ ...prev, [name]: value }))
-    setError('')
-  }
-
   const validateShipping = () => {
     const { address, city, postal_code, country, phone } = shippingForm
     if (!address || !city || !postal_code || !country || !phone) {
@@ -82,86 +53,53 @@ const Checkout = () => {
     return true
   }
 
-  const validatePayment = () => {
-    const { cardName, cardNumber, expiryDate, cvv } = paymentForm
-    if (!cardName || !cardNumber || !expiryDate || !cvv) {
-      setError('Please fill in all payment fields')
-      return false
-    }
-    if (!/^\d{16}$/.test(cardNumber.replace(/\s/g, ''))) {
-      setError('Please enter a valid card number (16 digits)')
-      return false
-    }
-    if (!/^\d{3,4}$/.test(cvv)) {
-      setError('Please enter a valid CVV')
-      return false
-    }
-    return true
-  }
-
-  const handleShippingNext = () => {
-    if (validateShipping()) {
-      setStep(2)
-      setError('')
+  const handlePlaceOrder = () => {
+    if (whatsappUrl) {
+      window.open(whatsappUrl, '_blank')
     }
   }
 
-  const handlePaymentSubmit = async () => {
-    if (!validatePayment()) return
+
+  const buildWhatsappUrl = () => {
+    const cleanPhone = (process.env.REACT_APP_WHATSAPP_NUMBER || '918438529815').replace(/\D/g, '')
+    const orderLines = items.map(
+      (item, index) =>
+        `${index + 1}. ${item.product.title} x ${item.quantity} = Rs.${(item.product.price * item.quantity).toFixed(2)}`
+    )
+    const message = [
+      'Hello SK Gift Shop, I want to place this order:',
+      '',
+      ...orderLines,
+      '',
+      `Subtotal: Rs.${totalPrice.toFixed(2)}`,
+      'Shipping: Rs.10.00',
+      `Total: Rs.${(totalPrice + 10).toFixed(2)}`,
+      '',
+      'Shipping Details:',
+      `Address: ${shippingForm.address}`,
+      `City: ${shippingForm.city}`,
+      `Postal Code: ${shippingForm.postal_code}`,
+      `Country: ${shippingForm.country}`,
+      `Phone: ${shippingForm.phone}`,
+    ].join('\n')
+
+    return `https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`
+  }
+
+  const handleShippingNext = async () => {
+    if (!validateShipping()) return
 
     setLoading(true)
     setError('')
 
     try {
-      const token = localStorage.getItem('sk_gift_token')
-      
-      // Create order
-      const orderRes = await fetch('/api/orders', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          items: items.map((item) => ({
-            product_id: item.product.id,
-            title: item.product.title,
-            price: item.product.price,
-            quantity: item.quantity,
-          })),
-          shipping_address: shippingForm,
-        }),
+      const whatsappLink = buildWhatsappUrl()
+      setOrderData({
+        id: Date.now(),
+        total_amount: totalPrice + 10,
       })
-
-      if (!orderRes.ok) {
-        const errData = await orderRes.json()
-        throw new Error(errData.error || 'Failed to create order')
-      }
-
-      const orderReply = await orderRes.json()
-      const order = orderReply.order
-
-      // Create transaction
-      const txRes = await fetch('/api/transactions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          order_id: order.id,
-          payment_method: paymentForm.paymentMethod,
-          amount: totalPrice,
-        }),
-      })
-
-      if (!txRes.ok) {
-        throw new Error('Payment processing failed')
-      }
-
-      const txReply = await txRes.json()
-      setOrderData({ order, transaction: txReply.transaction })
-      setStep(3)
+      setWhatsappUrl(whatsappLink)
+      setStep(2)
       clearCart()
     } catch (err) {
       setError(err.message || 'Checkout failed. Please try again.')
@@ -169,6 +107,7 @@ const Checkout = () => {
       setLoading(false)
     }
   }
+
 
   return (
     <div className="checkout-page">
@@ -182,10 +121,6 @@ const Checkout = () => {
             </div>
             <div className={`step ${step >= 2 ? 'active' : ''}`}>
               <span className="step-number">2</span>
-              <span className="step-label">Payment</span>
-            </div>
-            <div className={`step ${step >= 3 ? 'active' : ''}`}>
-              <span className="step-number">3</span>
               <span className="step-label">Confirmation</span>
             </div>
           </div>
@@ -193,6 +128,58 @@ const Checkout = () => {
 
         <div className="checkout-content">
           <div className="checkout-main">
+            {step === 2 && orderData && (
+              <div className="checkout-confirmation">
+                <div className="confirmation-animation" />
+                <div className="confirmation-success">
+                  <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                  <h2>Order Received!</h2>
+                  <p>Click 'Send Order Details' to send your order via WhatsApp for confirmation.</p>
+                </div>
+
+                <div className="confirmation-details">
+                  <div className="detail-section">
+                    <h3>Order Number</h3>
+                    <p className="detail-value">#{orderData.id}</p>
+                  </div>
+
+                  <div className="detail-section">
+                    <h3>Total Amount</h3>
+                    <p className="detail-value">₹{orderData.total_amount.toFixed(2)}</p>
+                  </div>
+
+                  <div className="detail-section">
+                    <h3>Shipping Address</h3>
+                    <p>
+                      {shippingForm.address}
+                      <br />
+                      {shippingForm.city}, {shippingForm.postal_code}
+                      <br />
+                      {shippingForm.country}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="confirmation-actions">
+                  <button
+                    onClick={handlePlaceOrder}
+                    className="btn-primary btn-large"
+                    disabled={!whatsappUrl}
+                  >
+                    Send Order Details via WhatsApp
+                  </button>
+                  <button
+                    onClick={() => navigate('/')}
+                    className="btn-secondary btn-large"
+                  >
+                    Continue Shopping
+                  </button>
+                </div>
+              </div>
+            )}
+
             {step === 1 && (
               <div className="checkout-form">
                 <h2>Shipping Address</h2>
@@ -266,100 +253,10 @@ const Checkout = () => {
                     type="button"
                     onClick={handleShippingNext}
                     className="btn-primary btn-large"
+                    disabled={loading}
                   >
-                    Continue to Payment
+                    {loading ? 'Placing Order...' : 'Place Order'}
                   </button>
-                </form>
-              </div>
-            )}
-
-            {step === 2 && (
-              <div className="checkout-form">
-                <h2>Payment Information</h2>
-                {error && <div className="checkout-error-msg">{error}</div>}
-                <form>
-                  <div className="form-group">
-                    <label htmlFor="cardName">Cardholder Name</label>
-                    <input
-                      id="cardName"
-                      type="text"
-                      name="cardName"
-                      value={paymentForm.cardName}
-                      onChange={handlePaymentChange}
-                      placeholder="John Doe"
-                      required
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label htmlFor="cardNumber">Card Number</label>
-                    <input
-                      id="cardNumber"
-                      type="text"
-                      name="cardNumber"
-                      value={paymentForm.cardNumber}
-                      onChange={(e) => {
-                        const val = e.target.value.replace(/\s/g, '').slice(0, 16)
-                        setPaymentForm((prev) => ({
-                          ...prev,
-                          cardNumber: val.replace(/(\d{4})/g, '$1 ').trim(),
-                        }))
-                      }}
-                      placeholder="1234 5678 9012 3456"
-                      required
-                    />
-                  </div>
-                  <div className="form-row">
-                    <div className="form-group">
-                      <label htmlFor="expiryDate">Expiry Date</label>
-                      <input
-                        id="expiryDate"
-                        type="text"
-                        name="expiryDate"
-                        value={paymentForm.expiryDate}
-                        onChange={(e) => {
-                          let val = e.target.value.replace(/\D/g, '').slice(0, 4)
-                          if (val.length >= 2) {
-                            val = val.slice(0, 2) + '/' + val.slice(2)
-                          }
-                          setPaymentForm((prev) => ({ ...prev, expiryDate: val }))
-                        }}
-                        placeholder="MM/YY"
-                        required
-                      />
-                    </div>
-                    <div className="form-group">
-                      <label htmlFor="cvv">CVV</label>
-                      <input
-                        id="cvv"
-                        type="text"
-                        name="cvv"
-                        value={paymentForm.cvv}
-                        onChange={(e) => {
-                          const val = e.target.value.replace(/\D/g, '').slice(0, 4)
-                          setPaymentForm((prev) => ({ ...prev, cvv: val }))
-                        }}
-                        placeholder="123"
-                        required
-                      />
-                    </div>
-                  </div>
-                  <div className="button-group">
-                    <button
-                      type="button"
-                      onClick={() => setStep(1)}
-                      className="btn-secondary"
-                    >
-                      Back
-                    </button>
-                    <button
-                      type="button"
-                      onClick={handlePaymentSubmit}
-                      className="btn-primary btn-large"
-                      disabled={loading}
-                    >
-                      {loading ? 'Processing...' : 'Complete Purchase'}
-                    </button>
-                  </div>
                 </form>
               </div>
             )}
