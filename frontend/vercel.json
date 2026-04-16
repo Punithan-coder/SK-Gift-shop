@@ -1,5 +1,4 @@
 {
-<<<<<<< HEAD
   "version": 2,
   "builds": [
     {
@@ -17,9 +16,3 @@
     }
   ]
 }
-=======
-  "rewrites": [
-    { "source": "/(.*)", "destination": "/index.html" }
-  ]
-}
->>>>>>> c2d8bdc81fd25a4e05bc84c738d38220d054a24b
