@@ -10,8 +10,7 @@ const Cart = lazy(() => import('./components/Cart/Cart'))
 const Checkout = lazy(() => import('./components/Checkout/Checkout'))
 const OrderHistory = lazy(() => import('./components/OrderHistory/OrderHistory'))
 const Contactpage = lazy(() => import('./components/Contactpage/Contactpage'))
-const Login = lazy(() => import('./components/Auth/Login'))
-const SignUp = lazy(() => import('./components/Auth/SignUp'))
+
 const Aboutpage = lazy(() => import('./components/Aboutpage/Aboutpage'))
 
 function LoadingFallback() {
@@ -63,8 +62,7 @@ function App() {
                 <Route path="/orders" element={<OrderHistory />} />
                 <Route path="/contact" element={<Contactpage />} />
                 <Route path="/about" element={<Aboutpage />} />
-                <Route path="/login" element={<Login />} />
-                <Route path="/signup" element={<SignUp />} />
+                
               </Routes>
             </Suspense>
           </main>
