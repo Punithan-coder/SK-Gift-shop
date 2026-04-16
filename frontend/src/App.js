@@ -4,8 +4,7 @@ import Footer from './components/Footer/Footer'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { AuthProvider } from './context/AuthContext'
 import { CartProvider } from './context/CartContext'
-
-const Homepage = lazy(() => import('./components/Homepage/Homepage'))
+import Homepage from './components/Homepage/Homepage'
 const ProductDetail = lazy(() => import('./components/ProductDetail/ProductDetail'))
 const Cart = lazy(() => import('./components/Cart/Cart'))
 const Checkout = lazy(() => import('./components/Checkout/Checkout'))
