@@ -53,7 +53,7 @@ const Navbar = () => {
   return (
     <header className={`nav-head ${menuOpen ? 'menu-open' : ''}`}>
       <Link to="/" className="nav-logo">
-        <h1>SK Gift Shop</h1>
+        <h1>Easy Clicks</h1>
       </Link>
 
       <nav className="nav-center">
@@ -61,6 +61,7 @@ const Navbar = () => {
           <li><Link to="/" className={isActive('/') ? 'active' : ''}>Home</Link></li>
           <li><a href="#products" onClick={handleScrollProducts}>Products</a></li>
           <li><Link to="/contact" className={isActive('/contact') ? 'active' : ''}>Contact</Link></li>
+          <li><Link to="/admin/dashboard" className={isActive('/admin/dashboard') ? 'active' : ''}>Admin</Link></li>
         </ul>
         <form className="search-bar" onSubmit={handleSearch} role="search">
           <input

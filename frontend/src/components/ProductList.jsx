@@ -1,9 +1,10 @@
-import { useMemo, useCallback } from 'react'
+import { useMemo, useCallback, useState, useEffect } from 'react'
 import { flushSync } from 'react-dom'
 import { useSearchParams, useNavigate } from 'react-router-dom'
 import ProductCard from './ProductCard'
 import './ProductList.css'
-import { SAMPLE_PRODUCTS } from '../data/products'
+
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000'
 
 const ProductList = () => {
   const [searchParams, setSearchParams] = useSearchParams()
@@ -11,8 +12,28 @@ const ProductList = () => {
   const q = (searchParams.get('q') ?? '').trim().toLowerCase()
   const cat = (searchParams.get('cat') ?? '').trim().toLowerCase()
 
+  const [backendProducts, setBackendProducts] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await fetch(`${API_URL}/api/products`)
+        if (!response.ok) throw new Error('Failed to fetch products')
+        const data = await response.json()
+        setBackendProducts(data.products || [])
+      } catch (err) {
+        setError(err.message)
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchProducts()
+  }, [])
+
   const products = useMemo(() => {
-    const list = SAMPLE_PRODUCTS
+    const list = backendProducts
     if (q) {
       return list.filter((p) =>
         (p.title ?? '').toLowerCase().includes(q) ||
@@ -23,7 +44,7 @@ const ProductList = () => {
       return list.filter((p) => (p.category ?? '').toLowerCase() === cat)
     }
     return list
-  }, [q, cat])
+  }, [q, cat, backendProducts])
 
   /** Clears ?cat= / ?q= first (flushSync so URL updates before navigate, otherwise search can stay merged). */
   const openFullCatalog = useCallback(() => {

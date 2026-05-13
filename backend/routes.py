@@ -1,13 +1,15 @@
-from flask import Blueprint, jsonify, request
-from . import db
-from .config import OWNER_WHATSAPP_NUMBER
-from .models import Product, ShippingDetails, Transaction, User, Order
+from flask import Blueprint, jsonify, request, current_app
+from __init__ import db
+from config import OWNER_WHATSAPP_NUMBER
+from models import Product, ShippingDetails, Transaction, User, Order
 from datetime import datetime
 from functools import wraps
 import jwt
 from twilio.rest import Client
 import os
 import json
+import uuid
+from werkzeug.utils import secure_filename
 from urllib.parse import quote_plus
 
 api = Blueprint('api', __name__)
@@ -129,6 +131,46 @@ def token_required(f):
         return f(*args, **kwargs)
     return decorated
 
+def admin_required(f):
+    @wraps(f)
+    @token_required
+    def decorated(*args, **kwargs):
+        if not getattr(request, 'user', None) or not request.user.is_admin:
+            return jsonify({'error': 'Admin privileges required'}), 403
+        return f(*args, **kwargs)
+    return decorated
+
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
+
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+@api.route('/upload', methods=['POST'])
+@admin_required
+def upload_file():
+    if 'image' not in request.files:
+        return jsonify({'error': 'No image part'}), 400
+    file = request.files['image']
+    if file.filename == '':
+        return jsonify({'error': 'No selected file'}), 400
+    if file and allowed_file(file.filename):
+        filename = secure_filename(file.filename)
+        # Append UUID to prevent collisions
+        unique_filename = f"{uuid.uuid4().hex}_{filename}"
+        
+        # Ensure upload directory exists
+        upload_folder = current_app.config.get('UPLOAD_FOLDER', os.path.join(current_app.root_path, 'static', 'uploads'))
+        os.makedirs(upload_folder, exist_ok=True)
+        
+        file_path = os.path.join(upload_folder, unique_filename)
+        file.save(file_path)
+        
+        # Return URL
+        return jsonify({'url': f'/static/uploads/{unique_filename}'}), 201
+    return jsonify({'error': 'File type not allowed'}), 400
+
+
 # Products API
 @api.route('/products', methods=['GET'])
 def list_products():
@@ -137,6 +179,7 @@ def list_products():
         'products': [{
             'id': p.id,
             'title': p.title,
+            'description': p.description,
             'price': p.price,
             'category': p.category,
             'image': p.image,
@@ -152,11 +195,87 @@ def get_product(product_id):
         'product': {
             'id': product.id,
             'title': product.title,
+            'description': product.description,
             'price': product.price,
             'category': product.category,
             'image': product.image,
         }
     })
+
+@api.route('/products', methods=['POST'])
+@admin_required
+def create_product():
+    data = request.get_json()
+    if not data or not data.get('title') or not data.get('price'):
+        return jsonify({'error': 'Title and price are required'}), 400
+    
+    product = Product(
+        title=data.get('title'),
+        description=data.get('description', ''),
+        price=float(data.get('price')),
+        category=data.get('category', ''),
+        image=data.get('image', '')
+    )
+    db.session.add(product)
+    db.session.commit()
+    
+    return jsonify({
+        'product': {
+            'id': product.id,
+            'title': product.title,
+            'description': product.description,
+            'price': product.price,
+            'category': product.category,
+            'image': product.image,
+        }
+    }), 201
+
+@api.route('/products/<int:product_id>', methods=['PUT'])
+@admin_required
+def update_product(product_id):
+    product = Product.query.get(product_id)
+    if not product:
+        return jsonify({'error': 'Product not found'}), 404
+        
+    data = request.get_json()
+    if not data:
+        return jsonify({'error': 'No data provided'}), 400
+        
+    if 'title' in data:
+        product.title = data['title']
+    if 'description' in data:
+        product.description = data['description']
+    if 'price' in data:
+        product.price = float(data['price'])
+    if 'category' in data:
+        product.category = data['category']
+    if 'image' in data:
+        product.image = data['image']
+        
+    db.session.commit()
+    
+    return jsonify({
+        'product': {
+            'id': product.id,
+            'title': product.title,
+            'description': product.description,
+            'price': product.price,
+            'category': product.category,
+            'image': product.image,
+        }
+    })
+
+@api.route('/products/<int:product_id>', methods=['DELETE'])
+@admin_required
+def delete_product(product_id):
+    product = Product.query.get(product_id)
+    if not product:
+        return jsonify({'error': 'Product not found'}), 404
+        
+    db.session.delete(product)
+    db.session.commit()
+    
+    return jsonify({'message': 'Product deleted successfully'})
 
 # Shipping API
 @api.route('/shipping', methods=['POST'])

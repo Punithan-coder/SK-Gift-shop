@@ -1,5 +1,5 @@
 from datetime import datetime
-from . import db
+from __init__ import db
 
 
 class User(db.Model):
@@ -8,6 +8,7 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(255), unique=True, nullable=False, index=True)
     password_hash = db.Column(db.String(255), nullable=False)
+    is_admin = db.Column(db.Boolean, default=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     def __repr__(self):
@@ -19,6 +20,7 @@ class Product(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(255), nullable=False)
+    description = db.Column(db.Text)
     price = db.Column(db.Float, nullable=False)
     category = db.Column(db.String(100))
     image = db.Column(db.String(500))

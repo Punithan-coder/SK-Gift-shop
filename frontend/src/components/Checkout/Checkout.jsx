@@ -72,8 +72,7 @@ const Checkout = () => {
       ...orderLines,
       '',
       `Subtotal: Rs.${totalPrice.toFixed(2)}`,
-      'Shipping: Rs.10.00',
-      `Total: Rs.${(totalPrice + 10).toFixed(2)}`,
+      `Total: Rs.${totalPrice.toFixed(2)}`,
       '',
       'Shipping Details:',
       `Address: ${shippingForm.address}`,
@@ -96,7 +95,7 @@ const Checkout = () => {
       const whatsappLink = buildWhatsappUrl()
       setOrderData({
         id: Date.now(),
-        total_amount: totalPrice + 10,
+        total_amount: totalPrice,
       })
       setWhatsappUrl(whatsappLink)
       setStep(2)
@@ -330,13 +329,9 @@ const Checkout = () => {
                 <span>Subtotal:</span>
                 <span>₹{totalPrice.toFixed(2)}</span>
               </div>
-              <div className="total-row">
-                <span>Shipping:</span>
-                <span>₹10.00</span>
-              </div>
               <div className="total-row total-final">
                 <span>Total:</span>
-                <span>₹{(totalPrice + 10).toFixed(2)}</span>
+                <span>₹{totalPrice.toFixed(2)}</span>
               </div>
             </div>
           </div>

@@ -46,10 +46,8 @@ const Footer = () => {
             </ul>
           </div>
           <div className="site-footer__col">
-            <h2 className="site-footer__heading">Mail us</h2>
-            <a className="site-footer__mail" href={`mailto:${MAIL}`}>
-              {MAIL}
-            </a>
+            <h2 className="site-footer__heading"></h2>
+
           </div>
           <div className="site-footer__col site-footer__col--social">
             <h2 className="site-footer__heading">Social</h2>
@@ -77,7 +75,7 @@ const Footer = () => {
         </div>
       </div>
       <div className="site-footer__bar">
-        <p className="site-footer__copyright">© {year} SK Gift Shop</p>
+        <p className="site-footer__copyright">© {year} Easy Clicks</p>
       </div>
     </footer>
   )

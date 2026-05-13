@@ -1,16 +1,40 @@
 import { useParams, Link } from 'react-router-dom'
-import { SAMPLE_PRODUCTS } from '../../data/products'
+import { useState, useEffect } from 'react'
 import { useCart } from '../../context/CartContext'
 import './ProductDetail.css'
 
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000'
+
 const ProductDetail = () => {
   const { id } = useParams()
-  const product = SAMPLE_PRODUCTS.find((p) => String(p.id) === id)
+  const [product, setProduct] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
 
-  if (!product) {
+  useEffect(() => {
+    const fetchProduct = async () => {
+      try {
+        const response = await fetch(`${API_URL}/api/products/${id}`)
+        if (!response.ok) throw new Error('Product not found')
+        const data = await response.json()
+        setProduct(data.product)
+      } catch (err) {
+        setError(err.message)
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchProduct()
+  }, [id])
+
+  if (loading) {
+    return <div className="product-detail"><p>Loading...</p></div>
+  }
+
+  if (error || !product) {
     return (
       <div className="product-detail product-detail--not-found">
-        <h2>Product not found</h2>
+        <h2>{error || 'Product not found'}</h2>
         <Link to={{ pathname: '/', search: '', hash: '#products' }}>← Back to shop</Link>
       </div>
     )
@@ -26,6 +50,8 @@ const ProductDetail = () => {
     if (!inCart) addToCart(product)
   }
 
+  const imageUrl = image?.startsWith('/static/') ? `${API_URL}${image}` : image
+
   return (
     <div className="product-detail">
       <Link
@@ -36,8 +62,8 @@ const ProductDetail = () => {
       </Link>
       <div className="product-detail__grid">
         <div className="product-detail__image-wrap">
-          {image ? (
-            <img src={image} alt={title} />
+          {imageUrl ? (
+            <img src={imageUrl} alt={title} />
           ) : (
             <div className="product-detail__placeholder" />
           )}

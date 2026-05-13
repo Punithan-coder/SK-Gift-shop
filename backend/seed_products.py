@@ -6,11 +6,13 @@ Run: python seed_products.py
 import sys
 import os
 
-# Add parent directory to path so we can import from root
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+# Add the backend directory to the path to avoid import errors
+backend_dir = os.path.dirname(os.path.abspath(__file__))
+if backend_dir not in sys.path:
+    sys.path.insert(0, backend_dir)
 
-from backend import create_app, db
-from backend.models import Product
+from __init__ import create_app, db
+from models import Product
 
 app = create_app()
 
@@ -85,17 +87,19 @@ SAMPLE_PRODUCTS = [
 
 def seed_database():
     with app.app_context():
-        # Clear existing products
-        Product.query.delete()
-        db.session.commit()
+        # Retrieve existing product titles to avoid duplicates if re-run
+        existing_products = {p.title for p in Product.query.all()}
         
         # Add sample products
+        added_count = 0
         for product_data in SAMPLE_PRODUCTS:
-            product = Product(**product_data)
-            db.session.add(product)
+            if product_data['title'] not in existing_products:
+                product = Product(**product_data)
+                db.session.add(product)
+                added_count += 1
         
         db.session.commit()
-        print(f'✓ Successfully seeded {len(SAMPLE_PRODUCTS)} products to the database!')
+        print(f'Successfully seeded {added_count} new products to the database!')
 
 if __name__ == '__main__':
     seed_database()

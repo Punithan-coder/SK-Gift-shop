@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom'
 import { useCart } from '../context/CartContext'
 import './ProductCard.css'
 
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000'
+
 const ProductCard = memo(({ product, onOpenFullCatalog }) => {
   const { id, title, price, category, image } = product ?? {}
   const navigate = useNavigate()
@@ -44,6 +46,8 @@ const ProductCard = memo(({ product, onOpenFullCatalog }) => {
     },
     [navigate, onOpenFullCatalog]
   )
+  
+  const imageUrl = image?.startsWith('/static/') ? `${API_URL}${image}` : image
 
   return (
     <>
@@ -54,8 +58,8 @@ const ProductCard = memo(({ product, onOpenFullCatalog }) => {
           onClick={handleShowAllProducts}
         >
           <div className="product-card__image">
-            {image ? (
-              <img src={image} alt={title} loading="lazy" />
+            {imageUrl ? (
+              <img src={imageUrl} alt={title} loading="lazy" />
             ) : (
               <div className="product-card__placeholder" />
             )}

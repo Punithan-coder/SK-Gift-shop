@@ -1,8 +1,8 @@
 import jwt
 from datetime import datetime, timedelta
 from flask import Blueprint, request, jsonify
-from . import db
-from .models import User
+from __init__ import db
+from models import User
 from flask_bcrypt import Bcrypt
 
 auth_bp = Blueprint('auth', __name__, url_prefix='/api/auth')
@@ -44,7 +44,7 @@ def register():
 
     return jsonify({
         'token': token,
-        'user': {'id': user.id, 'email': user.email}
+        'user': {'id': user.id, 'email': user.email, 'is_admin': user.is_admin}
     }), 201
 
 
@@ -72,7 +72,7 @@ def login():
 
     return jsonify({
         'token': token,
-        'user': {'id': user.id, 'email': user.email}
+        'user': {'id': user.id, 'email': user.email, 'is_admin': user.is_admin}
     })
 
 
@@ -88,7 +88,7 @@ def me():
         user = User.query.get(payload['user_id'])
         if not user:
             return jsonify({'error': 'User not found'}), 401
-        return jsonify({'user': {'id': user.id, 'email': user.email}})
+        return jsonify({'user': {'id': user.id, 'email': user.email, 'is_admin': user.is_admin}})
     except jwt.ExpiredSignatureError:
         return jsonify({'error': 'Token expired'}), 401
     except jwt.InvalidTokenError:
